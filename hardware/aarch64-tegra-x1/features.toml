@@ -1,0 +1,130 @@
+# Hardware feature status for OmarchySwitch on Nintendo Switch V1 (Erista).
+#
+# status values (validated by scripts/validate-architecture.sh):
+#   fonctionnel    verified working on real hardware by the project
+#   prepare        files/config exist, never executed on hardware
+#   a_tester       plausible but unverified; needs a hardware test
+#   bloque         cannot progress without a missing component or a decision
+#   non_supporte   out of scope for this base (documented, not promised)
+#
+# "blocker" must always say what is missing, even when status is fonctionnel
+# (use "aucun" then). This file is the single machine-readable truth used by
+# the documentation and the CI checks.
+
+[meta]
+target = "Nintendo Switch V1 (HAC-001)"
+soc = "NVIDIA Tegra X1 (ODNX02-A2)"
+kernel_reference = "4.9.140-l4t (Switchroot)"
+updated = "2026-11-10"
+
+[[feature]]
+id = "boot"
+label = "Démarrage hekate -> ATF -> U-Boot -> noyau"
+status = "prepare"
+blocker = "Binaires Switchroot absents (bl31.bin, bl33.bin, boot.scr, uImage, initramfs, nx-plat.dtimg) et aucun test sur console"
+owner = "bootloader/hekate_ipl.ini + switchroot/manifest.toml"
+notes = "La chaîne est documentée et les configurations sont prêtes. Rien n'a été démarré."
+
+[[feature]]
+id = "systemd"
+label = "Démarrage du système utilisateur Arch (systemd)"
+status = "bloque"
+blocker = "systemd 261 exige un noyau >= 4.15 et cgroup v2 ; le noyau L4T Switchroot est 4.9.140. Décision requise (voir ADR 0004)."
+owner = "docs/adr/0004-systemd-kernel-compatibility.md"
+notes = "Sans systemd, ni NetworkManager, ni session uwsm, ni unités du projet."
+
+[[feature]]
+id = "display"
+label = "Écran DSI 720x1280 et rétroéclairage"
+status = "prepare"
+blocker = "Dépend du noyau L4T + DTB Switchroot (non fournis) ; Hyprland jamais lancé sur la dalle"
+owner = "hardware/aarch64-tegra-x1/display/"
+notes = "Le panneau est monté en portrait ; la rotation est assurée par la configuration du compositeur."
+
+[[feature]]
+id = "gpu"
+label = "GPU GM20B (nvgpu / Mesa)"
+status = "prepare"
+blocker = "Blobs NVIDIA du BSP Switchroot absents ; rendu Wayland non testé"
+owner = "hardware/aarch64-tegra-x1/gpu/"
+notes = "Deux chemins possibles : nvgpu propriétaire (BSP) ou nouveau/Mesa (mainline, expérimental)."
+
+[[feature]]
+id = "audio"
+label = "Audio (haut-parleurs, casque, micro)"
+status = "prepare"
+blocker = "Modules snd_soc_tegra210 du noyau Switchroot non fournis ; routage ALSA/UCM non vérifié"
+owner = "hardware/aarch64-tegra-x1/audio/"
+notes = "PipeWire/WirePlumber prévus, jamais exécutés sur la console."
+
+[[feature]]
+id = "joycon"
+label = "Joy-Con attachés et Bluetooth"
+status = "prepare"
+blocker = "Driver HID du noyau Switchroot + rails non fournis ; pairing dump hekate non réalisé"
+owner = "hardware/aarch64-tegra-x1/joycon/"
+notes = "hekate peut exporter les informations de pairing ; elles n'ont pas été récupérées."
+
+[[feature]]
+id = "wifi"
+label = "Wi-Fi Broadcom BCM4356"
+status = "prepare"
+blocker = "Firmware brcmfmac4356-pcie.bin/.txt absent ; alimentation PCIe (ldo1) dépend du DTB"
+owner = "hardware/aarch64-tegra-x1/wifi/"
+notes = "Un firmware manquant ne produit aucune erreur visible : wlan0 n'apparaît simplement pas."
+
+[[feature]]
+id = "bluetooth"
+label = "Bluetooth (BCM2076)"
+status = "prepare"
+blocker = "Firmware .hcd et configuration hciattach non fournis/validés"
+owner = "hardware/aarch64-tegra-x1/bluetooth/"
+notes = "Sans Bluetooth, les Joy-Con détachés ne peuvent pas se connecter."
+
+[[feature]]
+id = "touchscreen"
+label = "Tactile stmfts"
+status = "prepare"
+blocker = "Pilote et calibration dépendent du noyau/DTB Switchroot ; aucune mesure de calibration"
+owner = "hardware/aarch64-tegra-x1/touchscreen/"
+notes = "Sur certaines dalles, la calibration au boot doit être désactivée (touch_skip_tuning)."
+
+[[feature]]
+id = "storage"
+label = "microSD, eMMC et options ext4 compatibles 4.9"
+status = "prepare"
+blocker = "Aucune image écrite ni montée sur console ; orphan_file/metadata_csum_seed doivent rester désactivés"
+owner = "hardware/aarch64-tegra-x1/storage/"
+notes = "build-image.sh crée l'ext4 avec les options compatibles 4.9."
+
+[[feature]]
+id = "power"
+label = "Batterie, charge, veille et thermique"
+status = "prepare"
+blocker = "MAX77620/MAX17050 dépendent du noyau+DTB ; aucune mesure de consommation ni test de veille"
+owner = "hardware/aarch64-tegra-x1/power/"
+notes = "La veille (LP0) exige libsys_lp0.bso côté hekate et un noyau compatible."
+
+[[feature]]
+id = "dock_hdmi"
+label = "Dock et sortie HDMI"
+status = "a_tester"
+blocker = "Nécessite une console, un dock et un écran ; configuration CEC/USB3 non validée"
+owner = "hardware/aarch64-tegra-x1/display/"
+notes = "Les clés cec_disable et 4k60_disable du bootstack hekate existent pour ce cas."
+
+[[feature]]
+id = "emmc_boot"
+label = "Installation sur l'eMMC interne"
+status = "non_supporte"
+blocker = "Risque de rendre Horizon OS inutilisable ; hors périmètre de la base 0.1.0"
+owner = "docs/06-known-limitations.md"
+notes = "Le projet cible la microSD. emmc=1 n'est volontairement pas utilisé."
+
+[[feature]]
+id = "mariko"
+label = "Switch 2019 / Lite / OLED (T210B01)"
+status = "non_supporte"
+blocker = "PMIC, DVFS et support noyau différents ; le projet cible Erista uniquement"
+owner = "docs/00-overview.md"
+notes = "Les clés hekate Mariko sont volontairement absentes des fichiers de configuration."

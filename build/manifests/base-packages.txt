@@ -1,0 +1,51 @@
+# Arch Linux ARM base packages for OmarchySwitch (aarch64).
+#
+# Installed by scripts/build-rootfs.sh after the system upgrade. A package that
+# does not exist on the Arch Linux ARM mirrors makes the build fail on purpose.
+#
+# Keep this list minimal: the desktop stack lives in desktop-packages.txt and
+# the Omarchy stack in omarchy-packages.txt.
+
+# --- Base system -----------------------------------------------------------
+base
+systemd
+systemd-sysvcompat
+pacman
+sudo
+util-linux
+e2fsprogs
+dosfstools
+less
+nano
+bash-completion
+man-db
+tzdata
+
+# --- Networking ------------------------------------------------------------
+networkmanager
+iw
+wpa_supplicant
+curl
+wget
+
+# --- Bluetooth -------------------------------------------------------------
+bluez
+bluez-utils
+
+# --- Audio -----------------------------------------------------------------
+pipewire
+pipewire-pulse
+wireplumber
+
+# --- Hardware helpers ------------------------------------------------------
+brightnessctl
+evtest
+usbutils
+pciutils
+lm_sensors
+upower
+
+# --- Tooling ---------------------------------------------------------------
+git
+rsync
+htop

@@ -1,0 +1,7 @@
+# Patch series for OmarchySwitch.
+#
+# One patch file name per line, in application order. Blank lines and lines
+# starting with '#' are ignored. Files live in this directory.
+#
+# No patch is applied in the 0.1.0 base: every adaptation is a configuration
+# override. See README.md in this directory before adding the first patch.

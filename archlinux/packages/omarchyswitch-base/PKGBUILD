@@ -1,0 +1,58 @@
+# Maintainer: OmarchySwitch contributors
+# Status: prepared, not yet built or installed on hardware.
+#
+# Meta package: it installs no binary of its own. Its purpose is to declare, in
+# one place, the Arch packages every OmarchySwitch root filesystem must have,
+# so a rebuilt rootfs can be validated against a single list.
+#
+# Build on an aarch64 host (or in an aarch64 chroot):
+#   makepkg -sri --needed
+
+pkgname=omarchyswitch-base
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="OmarchySwitch base meta package for the Nintendo Switch V1 (Erista)"
+arch=('any')
+url="https://github.com/ClmentCch/OmarchySwitch"
+license=('MIT')
+depends=(
+  'base'
+  'systemd'
+  'pacman'
+  'sudo'
+  'networkmanager'
+  'bluez'
+  'bluez-utils'
+  'pipewire'
+  'pipewire-pulse'
+  'wireplumber'
+  'iw'
+  'wpa_supplicant'
+  'brightnessctl'
+  'evtest'
+  'htop'
+  'nano'
+  'less'
+  'which'
+  'bash-completion'
+  'git'
+  'rsync'
+  'curl'
+  'wget'
+  'dosfstools'
+  'e2fsprogs'
+  'util-linux'
+)
+optdepends=(
+  'hyprland: graphical session'
+  'waybar: status bar'
+  'walker: application launcher'
+  'foot: terminal'
+)
+options=('!strip')
+install=omarchyswitch-base.install
+
+package() {
+  install -Dm644 /dev/null "$pkgdir/usr/share/omarchyswitch/base-package"
+  printf '%s\n' "OmarchySwitch base meta package" > "$pkgdir/usr/share/omarchyswitch/base-package"
+}

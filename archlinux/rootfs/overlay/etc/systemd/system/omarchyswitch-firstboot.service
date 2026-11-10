@@ -1,0 +1,21 @@
+[Unit]
+Description=OmarchySwitch first boot setup
+Documentation=https://github.com/ClmentCch/OmarchySwitch
+# Runs once: the script creates this marker when it is done.
+ConditionPathExists=!/var/lib/omarchyswitch/.firstboot-done
+After=local-fs.target systemd-remount-fs.service
+Before=display-manager.service getty@tty1.service
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/omarchyswitch-firstboot
+StandardOutput=journal+console
+StandardError=journal+console
+# The script is careful, but it must never leave the system unable to boot.
+SuccessExitStatus=0
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

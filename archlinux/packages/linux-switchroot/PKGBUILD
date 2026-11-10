@@ -1,0 +1,82 @@
+# Maintainer: OmarchySwitch contributors
+# Status: UNTESTED. Not built by CI, not verified on hardware.
+#
+# Builds the Switchroot L4T 4.9.140 kernel for Tegra X1 from upstream sources.
+# This package exists so the kernel build is documented and repeatable; the
+# base 0.1.0 system ships the kernel binary extracted from an official
+# Switchroot release instead (see switchroot/README.md).
+#
+# Before using it:
+#   1. build it on an aarch64 host with the toolchain below (or cross-compile),
+#   2. verify the resulting uImage and module tree belong to the same build,
+#   3. test it on the console before publishing anything.
+#
+# Upstream build documentation:
+#   https://gitlab.com/switchroot/kernel/l4t-kernel-build-scripts
+#
+# The switchroot kernel is a downstream NVIDIA L4T tree: it is NOT defconfig
+# compatible with the mainline kernel, and its scripts expect the NVIDIA
+# toolchain layout. Do not "fix" it by switching to linux-arm64 defconfig.
+
+pkgname=linux-switchroot
+_kernelver=4.9.140
+pkgver=${_kernelver}_l4t
+pkgrel=1
+pkgdesc="Switchroot L4T ${_kernelver} kernel for NVIDIA Tegra X1 (Nintendo Switch Erista) - UNTESTED package"
+arch=('aarch64')
+url="https://gitlab.com/switchroot/kernel/l4t-kernel-4.9"
+license=('GPL-2.0')
+provides=("linux=${pkgver}")
+conflicts=('linux' 'linux-aarch64' 'linux-omarchy')
+options=('!strip' '!debug')
+
+# Pinned to the newest upstream tag as of 2026-11-10. See configs/versions.lock.
+_commit=linux-5.1.0_r2
+source=("${pkgname}-${pkgver}.tar.gz::https://gitlab.com/switchroot/kernel/l4t-kernel-4.9/-/archive/${_commit}/l4t-kernel-4.9-${_commit}.tar.gz")
+sha256sums=('SKIP')  # TODO: pin the archive hash before use
+
+depends=('glibc' 'gcc-libs')
+makedepends=('git' 'bc' 'dtc' 'kmod' 'xmlto' 'docbook-xsl' 'openssl' 'libelf' 'pahole' 'aarch64-linux-gnu-gcc' 'uboot-tools')
+# Device-tree sources come from separate Switchroot repositories; vendor them
+# into the build directory before compiling (see prepare()).
+
+prepare() {
+  cd "l4t-kernel-4.9-${_commit}"
+  # Keep the tree pristine; apply source changes as patches, never in place.
+  # Example:
+  #   patch -Np1 -i "$srcdir/0001-example.patch"
+  :
+}
+
+build() {
+  cd "l4t-kernel-4.9-${_commit}"
+  # The upstream tree expects ARCH=arm64 and the L4T tegra defconfig.
+  # This has not been executed successfully for this package: treat the
+  # commands below as the documented starting point, not as a working recipe.
+  make ARCH=arm64 CROSS_COMPILE="${CROSS_COMPILE:-aarch64-linux-gnu-}" tegra_defconfig
+  make ARCH=arm64 CROSS_COMPILE="${CROSS_COMPILE:-aarch64-linux-gnu-}" -j"$(nproc)" uImage
+  make ARCH=arm64 CROSS_COMPILE="${CROSS_COMPILE:-aarch64-linux-gnu-}" -j"$(nproc)" modules
+}
+
+package() {
+  cd "l4t-kernel-4.9-${_commit}"
+
+  # Boot image: U-Boot uImage, exactly what the L4T loader expects.
+  install -Dm644 arch/arm64/boot/uImage \
+    "$pkgdir/boot/switchroot/omarchyswitch/uImage"
+
+  # Device trees: nx-plat.dtimg must come from the Switchroot platform tree,
+  # not from this kernel. Installing a mainline DTB here would produce a black
+  # screen. Left as an explicit failure so nobody ships a half kernel.
+  if [[ ! -f "$srcdir/nx-plat.dtimg" ]]; then
+    error "nx-plat.dtimg is missing: provide the Switchroot platform device-tree image in \$srcdir"
+    exit 1
+  fi
+  install -Dm644 "$srcdir/nx-plat.dtimg" \
+    "$pkgdir/boot/switchroot/omarchyswitch/nx-plat.dtimg"
+
+  # Modules must match the kernel build exactly.
+  make ARCH=arm64 INSTALL_MOD_PATH="$pkgdir/usr" modules_install
+
+  install -Dm644 COPYING "$pkgdir/usr/share/licenses/$pkgname/COPYING"
+}

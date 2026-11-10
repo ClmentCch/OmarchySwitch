@@ -1,0 +1,7 @@
+# Arch packages for readable text on a 1280x720 panel.
+# One package per line; blank lines and comments are ignored.
+# Verified only for availability on the Arch Linux ARM aarch64 repositories at
+# build time: pacman fails loudly if a package is missing, which is intended.
+ttf-jetbrains-mono
+noto-fonts
+noto-fonts-emoji

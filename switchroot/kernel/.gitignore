@@ -1,0 +1,5 @@
+# Switchroot payloads are never versioned here.
+# See switchroot/README.md for where each file comes from and why.
+*
+!.gitignore
+!README.md

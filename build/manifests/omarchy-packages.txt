@@ -1,0 +1,14 @@
+# Omarchy packages installed from pkgs.omarchy.org (aarch64).
+#
+# Verified reachable on 2026-11-10:
+#   https://pkgs.omarchy.org/stable/aarch64/omarchy-4.5.0-3-aarch64.pkg.tar.zst
+#
+# Never add linux-omarchy here: it does not support Tegra X1 and would replace
+# the Switchroot kernel. scripts/integrate-omarchy.sh refuses it explicitly.
+
+# Required: Omarchy CLI, configuration and session integration.
+omarchy
+
+# Optional: verify availability on the aarch64 repository before enabling.
+#   pacman -Si omarchy-settings   (inside the chroot, after the repo is added)
+#omarchy-settings

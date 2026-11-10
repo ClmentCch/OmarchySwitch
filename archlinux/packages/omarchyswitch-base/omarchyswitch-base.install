@@ -1,0 +1,24 @@
+# Hooks for omarchyswitch-base.
+#
+# Nothing destructive: this package only declares dependencies. The message is
+# the useful part, because a user who installs it expects a working desktop and
+# will not get one without the Switchroot components.
+
+post_install() {
+  cat <<'EOF'
+==> OmarchySwitch base packages installed.
+
+The kernel, device tree, modules, firmware and boot files are NOT part of this
+package: they come from Switchroot and must be integrated separately.
+
+  ./switchroot/README.md
+  sudo ./scripts/integrate-switchroot.sh --rootfs <rootfs>
+
+Known limitation: Arch's systemd cannot start on the Switchroot L4T 4.9 kernel.
+See docs/adr/0004-systemd-kernel-compatibility.md.
+EOF
+}
+
+post_upgrade() {
+  post_install
+}

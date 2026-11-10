@@ -1,0 +1,15 @@
+# Arch Linux ARM mirrorlist — OmarchySwitch
+#
+# Installed as /etc/pacman.d/mirrorlist inside the rootfs.
+# Used by the [extra], [alarm] and [aur] sections of pacman.conf.
+#
+# Only aarch64 mirrors belong here. The project builds aarch64 only, and a
+# foreign mirror would silently provide incompatible packages.
+#
+# Official mirror information: https://archlinuxarm.org/about/mirrors
+
+Server = http://mirror.archlinuxarm.org/$arch/$repo
+Server = http://eu.mirror.archlinuxarm.org/$arch/$repo
+Server = http://us.mirror.archlinuxarm.org/$arch/$repo
+Server = http://de.mirror.archlinuxarm.org/$arch/$repo
+Server = http://fr.mirror.archlinuxarm.org/$arch/$repo

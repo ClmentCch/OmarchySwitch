@@ -1,0 +1,14 @@
+# System applications for OmarchySwitch (Arch Linux ARM aarch64).
+# One package per line; comments and blank lines are ignored.
+# These are optional on top of build/manifests/base-packages.txt.
+evtest
+usbutils
+pciutils
+lm_sensors
+iw
+wpa_supplicant
+upower
+brightnessctl
+less
+nano
+rsync

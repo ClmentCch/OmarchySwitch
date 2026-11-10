@@ -1,0 +1,63 @@
+# Build output
+/dist/
+/build/output/
+/build/src/
+/build/cache/
+
+# Local overrides (never commit machine-specific settings or paths)
+/configs/local.conf
+
+# Images and archives
+*.img
+*.img.xz
+*.img.zst
+*.zip
+*.tar.zst
+
+# Switchroot / boot payload binaries (never redistributed through git)
+switchroot/kernel/*
+!switchroot/kernel/README.md
+switchroot/dtb/*
+!switchroot/dtb/README.md
+switchroot/modules/*
+!switchroot/modules/README.md
+switchroot/firmware/*
+!switchroot/firmware/README.md
+switchroot/boot/*
+!switchroot/boot/README.md
+*.dtb
+*.dtbo
+*.dtimg
+*.scr
+uImage
+uImage.gz
+Image
+initramfs
+initrd.img
+bl31.bin
+bl33.bin
+*.bso
+*.kip
+*.kip1
+hekate.bin
+hekate_ctcaer_*.bin
+payload.bin
+
+# Downloaded upstream sources
+/omarchy/upstream/src/
+/omarchy/upstream/build/
+*.pkg.tar.*
+*.pkg.tar.zst
+
+# Editors / OS noise
+.DS_Store
+*.swp
+*~
+.idea/
+.vscode/
+__pycache__/
+*.pyc
+
+# Logs and temporary files
+*.log
+/tmp/

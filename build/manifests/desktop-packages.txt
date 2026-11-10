@@ -1,0 +1,38 @@
+# Desktop stack for the Nintendo Switch (Arch Linux ARM aarch64).
+#
+# Installed by scripts/install-desktop.sh. These are the packages the project
+# actually starts; anything else is the user's choice.
+#
+# Package names are Arch names: if one is unavailable on the ARM mirrors, the
+# install fails loudly. Verify with `pacman -Si <name>` in an aarch64 rootfs
+# before adding an uncertain entry.
+
+# --- Compositor and session ------------------------------------------------
+hyprland
+uwsm
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+polkit
+seatd
+
+# --- Bar, launcher, terminal ----------------------------------------------
+waybar
+foot
+walker
+
+# --- Wayland utilities -----------------------------------------------------
+wl-clipboard
+grim
+slurp
+swaybg
+
+# --- Notifications ---------------------------------------------------------
+mako
+libnotify
+
+# --- Network UI ------------------------------------------------------------
+network-manager-applet
+
+# --- Bluetooth UI ----------------------------------------------------------
+bluez
+bluez-utils

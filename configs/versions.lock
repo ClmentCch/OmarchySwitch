@@ -1,0 +1,48 @@
+# OmarchySwitch - pinned upstream versions.
+#
+# Format: KEY = "value"   (bash-compatible, sourced by validation and build
+# scripts). Bump a value here and in the matching documentation together.
+#
+# Verified against upstream on 2026-11-10. Re-verify before every release:
+#   ./build/scripts/fetch-upstreams.sh --check
+
+# --- Omarchy --------------------------------------------------------------
+OMARCHY_TAG="v4.5.0"
+OMARCHY_RELEASE_DATE="2026-11-04"
+OMARCHY_LICENSE="MIT"
+OMARCHY_PKG_CHANNEL="stable"
+OMARCHY_PKG_ARCH="aarch64"
+OMARCHY_PKG_SAMPLE="omarchy-4.5.0-3-aarch64.pkg.tar.zst"
+OMARCHY_AARCH64_ISO="https://iso.omarchy.org/omarchy-4.5.0-aarch64.iso"
+
+# --- hekate ---------------------------------------------------------------
+HEKATE_VERSION="v6.5.4"
+HEKATE_LICENSE="GPL-2.0"
+
+# --- Switchroot -----------------------------------------------------------
+SWITCHROOT_KERNEL_REF="linux-5.1.0_r2"
+SWITCHROOT_KERNEL_BRANCH="lineage-19.1"
+SWITCHROOT_KERNEL_VERSION="4.9.140"
+SWITCHROOT_L4T_BSP="r32.7.3"
+SWITCHROOT_UBOOT_BRANCH="linux-hekatf"
+SWITCHROOT_ATF_BRANCH="switch-v4-atf2.6"
+SWITCHROOT_LICENSE_KERNEL="GPL-2.0"
+SWITCHROOT_LICENSE_ATF="BSD-3-Clause"
+SWITCHROOT_LICENSE_UBOOT="GPL-2.0-or-later"
+
+# --- Arch Linux ARM -------------------------------------------------------
+ALARM_SUITE="aarch64"
+ALARM_REPOS="core extra alarm aur"
+ALARM_GLIBC_MIN_FOR_SYSTEMD="2.36"
+
+# --- Compatibility constraints (facts, not preferences) -------------------
+# systemd >= 250 requires kernel >= 4.15 and cgroup v2. The Switchroot L4T
+# kernel is 4.9.140, so Arch's systemd cannot boot on it unmodified.
+SYSTEMD_MIN_KERNEL="4.15"
+L4T_KERNEL_VERSION="4.9.140"
+KERNEL_SYSTEMD_COMPATIBLE="no"
+
+# --- Desktop --------------------------------------------------------------
+HYPRLAND_MIN_VERSION="0.40"
+WAYBAR_MIN_VERSION="0.10"
+UWSM_MIN_VERSION="0.1"

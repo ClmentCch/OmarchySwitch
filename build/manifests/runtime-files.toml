@@ -1,0 +1,130 @@
+# Expected layout of the FAT boot partition and the root filesystem after a
+# complete integration.
+#
+# This is a documentation/verification manifest, not an installer: the files
+# themselves come from Switchroot (see switchroot/manifest.toml) and from the
+# repository (bootloader/, archlinux/).
+#
+# Used to sanity-check a card with:
+#   recovery/diagnostics/collect.sh
+
+[meta]
+schema = 1
+filesystem = "fat32"
+label = "OMARCHYSW"
+boot_prefix = "/switchroot/omarchyswitch"
+
+# --- Files hekate needs at runtime ----------------------------------------
+[[entry]]
+path = "/bootloader/hekate_ipl.ini"
+origin = "repository"
+required = true
+note = "Main configuration; entries can also live in bootloader/ini/"
+
+[[entry]]
+path = "/bootloader/ini/omarchyswitch-erista.ini"
+origin = "repository"
+required = true
+note = "Normal boot entry"
+
+[[entry]]
+path = "/bootloader/sys/nyx.bin"
+origin = "hekate release"
+required = true
+note = "Nyx GUI; hekate refuses L4T boot without its sys/ files"
+
+[[entry]]
+path = "/bootloader/sys/res.pak"
+origin = "hekate release"
+required = true
+note = "Nyx resources"
+
+[[entry]]
+path = "/bootloader/sys/libsys_lp0.bso"
+origin = "hekate release"
+required = true
+note = "Sleep (LP0) support; missing => 'missing lp0 (sleep) lib'"
+
+[[entry]]
+path = "/bootloader/sys/libsys_minerva.bso"
+origin = "hekate release"
+required = true
+note = "DRAM training; missing => 'missing minerva lib'"
+
+[[entry]]
+path = "/bootloader/sys/l4t/bpmpfw.bin"
+origin = "hekate release"
+required = true
+note = "BPMP firmware for L4T (filename may carry a revision suffix)"
+
+[[entry]]
+path = "/bootloader/sys/l4t/mtc_tbl_config.bin"
+origin = "hekate release"
+required = true
+note = "RAM training tables for L4T"
+
+# --- Files the hekate L4T entry loads -------------------------------------
+[[entry]]
+path = "/switchroot/omarchyswitch/uImage"
+origin = "switchroot"
+required = true
+note = "Kernel; see switchroot/kernel/README.md"
+
+[[entry]]
+path = "/switchroot/omarchyswitch/initramfs"
+origin = "switchroot"
+required = true
+note = "Initramfs that mounts the rootfs and runs switch_root"
+
+[[entry]]
+path = "/switchroot/omarchyswitch/nx-plat.dtimg"
+origin = "switchroot"
+required = true
+note = "Platform device trees; without it the panel stays dark"
+
+[[entry]]
+path = "/switchroot/omarchyswitch/boot.scr"
+origin = "switchroot"
+required = true
+note = "U-Boot script"
+
+[[entry]]
+path = "/switchroot/omarchyswitch/bl31.bin"
+origin = "switchroot"
+required = true
+note = "ARM Trusted Firmware"
+
+[[entry]]
+path = "/switchroot/omarchyswitch/bl33.bin"
+origin = "switchroot"
+required = true
+note = "U-Boot stage"
+
+# --- Root filesystem markers ---------------------------------------------
+[[entry]]
+path = "/etc/switchroot_version.conf"
+origin = "repository"
+filesystem = "ext4"
+required = true
+note = "The Switchroot initramfs refuses switch_root without it"
+
+[[entry]]
+path = "/etc/fstab"
+origin = "generated"
+filesystem = "ext4"
+required = true
+note = "Generated from the partition labels (LABEL=OSWITCH, LABEL=OMARCHYSW)"
+
+[[entry]]
+path = "/usr/lib/modules"
+origin = "switchroot"
+filesystem = "ext4"
+required = true
+note = "Must match the kernel exactly; see switchroot/modules/README.md"
+
+[[entry]]
+path = "/lib/firmware/brcmfmac4356-pcie.bin"
+origin = "switchroot"
+filesystem = "ext4"
+required = true
+note = "Wi-Fi firmware; absence is silent (no wlan0)"

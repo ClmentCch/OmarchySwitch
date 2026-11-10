@@ -1,0 +1,4 @@
+# Switchroot payloads are never versioned here.
+*
+!.gitignore
+!README.md

@@ -1,0 +1,76 @@
+# Switchroot application inventory for OmarchySwitch.
+#
+# status values (validated by scripts/validate-architecture.sh):
+#   porte       buildable for Arch aarch64 and verified running on the console
+#   a_porter    license/source allow it; porting work not done
+#   bloque      cannot be ported with the information or components available
+#   remplace    replaced by a maintained Arch package or a project script
+#
+# This manifest deliberately claims nothing as working. Every "a_porter" entry
+# needs a PKGBUILD and a hardware test before it can move to "porte".
+
+[meta]
+schema = 1
+target = "nintendo-switch-v1-erista"
+source_ecosystem = "Switchroot (Ubuntu Bionic/Jammy, L4S)"
+updated = "2026-11-10"
+
+[[application]]
+id = "l4t-megascript"
+label = "L4T-Megascript (collection de scripts Switchroot)"
+license = "A verifier a la source (scripts communautaires)"
+upstream = "https://github.com/nicman23/l4t-megascript"
+status = "a_porter"
+requires = ["bash", "curl", "depots Ubuntu"]
+blocker = "Script concu pour Ubuntu : chemins apt/PPA, paquets inexistants sur Arch ARM. Reecriture par fonctionnalite."
+notes = "Utile comme catalogue de ce qui existe, pas comme installateur."
+
+[[application]]
+id = "joycond"
+label = "joycond (daemon Joy-Con)"
+license = "GPL-3.0 (a confirmer a la source)"
+upstream = "https://github.com/DanielOgorchock/joycond"
+status = "a_porter"
+requires = ["hid-nintendo", "bluez", "python3"]
+blocker = "Depend du driver hid-nintendo du noyau ; compilation et test avec de vrais Joy-Con necessaires."
+notes = "Peut devenir un PKGBUILD simple si le driver est present dans le noyau Switchroot."
+
+[[application]]
+id = "nvpmodel"
+label = "nvpmodel (profils de performance Tegra)"
+license = "Proprietaire NVIDIA (BSP L4T)"
+upstream = "NVIDIA L4T BSP via les images Switchroot"
+status = "bloque"
+requires = ["blobs L4T", "config /etc/nvpmodel/nvpmodel_t210.conf"]
+blocker = "Binaire proprietaire non redistribuable et lie au BSP ; pas de source publique."
+notes = "Un profil de performance devra etre choisi autrement (frequences via sysfs) ou reste non supporte."
+
+[[application]]
+id = "network-scripts"
+label = "Scripts reseau Switchroot"
+license = "GPL-2.0 (scripts)"
+upstream = "Images Switchroot"
+status = "remplace"
+requires = ["NetworkManager", "wpa_supplicant"]
+blocker = "Aucun : remplaces par NetworkManager, installe et active par install-desktop.sh."
+notes = "Effet de bord : les commandes documentees dans les guides Switchroot (ifupdown) ne s'appliquent pas."
+
+[[application]]
+id = "brightness-tools"
+label = "Outils de luminosite Switchroot"
+license = "GPL-2.0"
+upstream = "Images Switchroot"
+status = "remplace"
+requires = ["brightnessctl"]
+blocker = "Aucun : brightnessctl couvre le besoin via /sys/class/backlight."
+notes = "Le peripherique backlight depend du noyau et du DTB."
+
+[[application]]
+id = "moonlight-qt"
+label = "Moonlight (streaming de jeux)"
+license = "GPL-3.0"
+upstream = "https://github.com/moonlight-stream/moonlight-qt"
+status = "a_porter"
+requires = ["qt6", "ffmpeg avec decodage materiel", "VIC/NVDEC"]
+blocker = "Disponibilite aarch64 et decodage materiel non verifies sur ce noyau."
+notes = "Ne pas promettre : le decodage materiel depend des blobs BSP."

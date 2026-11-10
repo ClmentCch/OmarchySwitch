@@ -1,0 +1,131 @@
+# Switchroot component manifest for OmarchySwitch (Erista).
+#
+# This file DECLARES what the build needs. It contains no binaries: the kernel,
+# DTBs, modules, firmware, ATF and U-Boot are fetched by you from Switchroot
+# (see switchroot/README.md) and measured with
+#   switchroot/scripts/import-components.sh
+# which writes the real SHA-256 values into switchroot/manifest.local.toml
+# (gitignored). integrate-switchroot.sh refuses to copy anything that has no
+# recorded hash unless --allow-unverified is passed.
+#
+# source_dir is relative to switchroot/ and is where you place the files.
+# target "boot"  -> FAT partition staging tree (hekate / U-Boot read it)
+# target "rootfs" -> into the Arch root filesystem
+#
+# Do not add binary files to this repository: licenses and redistribution
+# terms of NVIDIA and Switchroot components forbid it here.
+
+[meta]
+schema = 1
+target_family = "erista"
+profile = "omarchyswitch-0.1.0"
+updated = "2026-11-10"
+reference_kernel = "4.9.140-l4t"
+reference_bsp = "r32.7.3"
+note = "Hashes are intentionally empty until you import verified files."
+
+[[component]]
+id = "kernel"
+label = "Linux L4T kernel (uImage, Tegra X1)"
+license = "GPL-2.0"
+upstream = "https://gitlab.com/switchroot/kernel/l4t-kernel-4.9"
+target = "boot"
+dest_dir = "/switchroot/omarchyswitch"
+source_dir = "kernel"
+mode = "files"
+required = true
+files = [
+  { name = "uImage", sha256 = "", bytes = 0 },
+]
+
+[[component]]
+id = "initramfs"
+label = "Switchroot L4T initramfs"
+license = "GPL-2.0"
+upstream = "https://gitlab.com/switchroot/kernel/l4t-initramfs"
+target = "boot"
+dest_dir = "/switchroot/omarchyswitch"
+source_dir = "boot"
+mode = "files"
+required = true
+files = [
+  { name = "initramfs", sha256 = "", bytes = 0 },
+]
+
+[[component]]
+id = "dtb"
+label = "Tegra 210 Switch platform device trees (nx-plat.dtimg)"
+license = "GPL-2.0"
+upstream = "https://gitlab.com/switchroot/kernel/l4t-device-tree-overlays"
+target = "boot"
+dest_dir = "/switchroot/omarchyswitch"
+source_dir = "dtb"
+mode = "files"
+required = true
+files = [
+  { name = "nx-plat.dtimg", sha256 = "", bytes = 0 },
+]
+
+[[component]]
+id = "bootscript"
+label = "U-Boot boot script (boot.scr)"
+license = "GPL-2.0"
+upstream = "https://gitlab.com/switchroot/bootstack/switch-uboot-scripts"
+target = "boot"
+dest_dir = "/switchroot/omarchyswitch"
+source_dir = "boot"
+mode = "files"
+required = true
+files = [
+  { name = "boot.scr", sha256 = "", bytes = 0 },
+]
+
+[[component]]
+id = "atf"
+label = "ARM Trusted Firmware (bl31.bin)"
+license = "BSD-3-Clause"
+upstream = "https://gitlab.com/switchroot/bootstack/switch-atf"
+target = "boot"
+dest_dir = "/switchroot/omarchyswitch"
+source_dir = "boot"
+mode = "files"
+required = true
+files = [
+  { name = "bl31.bin", sha256 = "", bytes = 0 },
+]
+
+[[component]]
+id = "uboot"
+label = "U-Boot / L4T bootloader stage (bl33.bin)"
+license = "GPL-2.0-or-later"
+upstream = "https://gitlab.com/switchroot/bootstack/switch-uboot"
+target = "boot"
+dest_dir = "/switchroot/omarchyswitch"
+source_dir = "boot"
+mode = "files"
+required = true
+files = [
+  { name = "bl33.bin", sha256 = "", bytes = 0 },
+]
+
+[[component]]
+id = "modules"
+label = "Kernel modules matching the L4T kernel"
+license = "GPL-2.0"
+upstream = "https://gitlab.com/switchroot/kernel/l4t-kernel-4.9"
+target = "rootfs"
+dest_dir = "/usr/lib/modules"
+source_dir = "modules"
+mode = "tree"
+required = true
+
+[[component]]
+id = "firmware"
+label = "Firmware (Wi-Fi/BT Broadcom, Tegra BPMP, XUSB, GPU blobs)"
+license = "Mixed: NVIDIA proprietary + redistributable firmware"
+upstream = "NVIDIA L4T BSP via Switchroot rootfs"
+target = "rootfs"
+dest_dir = "/lib/firmware"
+source_dir = "firmware"
+mode = "tree"
+required = true

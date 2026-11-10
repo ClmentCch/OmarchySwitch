@@ -1,0 +1,71 @@
+// OmarchySwitch — Waybar reference configuration (Nintendo Switch V1)
+//
+// NOT active by default. Merge the modules you want into
+// ~/.config/waybar/config.jsonc, or point Waybar at this file explicitly.
+//
+// Kept deliberately small: every module here reads a kernel interface that
+// exists on the Switch once the Switchroot kernel, DTB and firmware are in
+// place. A module whose source is missing renders as an empty box, which is
+// harder to diagnose than an absent module.
+
+{
+  "layer": "top",
+  "position": "top",
+  "height": 30,
+  "spacing": 4,
+
+  "modules-left": ["clock"],
+  "modules-center": [],
+  "modules-right": ["wireplumber", "network", "bluetooth", "backlight", "battery", "temperature"],
+
+  "clock": {
+    "format": "{:%H:%M}",
+    "tooltip-format": "<tt>{calendar}</tt>"
+  },
+
+  "wireplumber": {
+    "format": "{icon} {volume}%",
+    "format-muted": "muted",
+    "format-icons": ["", "", ""],
+    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+  },
+
+  "network": {
+    "format-wifi": "wifi {essid}",
+    "format-ethernet": "eth",
+    "format-disconnected": "offline",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%)\n{ipaddr}",
+    "on-click": "nm-connection-editor"
+  },
+
+  "bluetooth": {
+    "format": "bt {status}",
+    "format-disabled": "bt off",
+    "format-connected": "bt {device_alias}",
+    "tooltip-format": "{controller_alias}\n{num_connections} connection(s)",
+    "on-click": "bluetoothctl power toggle"
+  },
+
+  "backlight": {
+    "device": "intel_backlight",
+    "format": "brightness {percent}%",
+    "tooltip": false
+  },
+
+  "battery": {
+    "states": {
+      "warning": 20,
+      "critical": 10
+    },
+    "format": "battery {capacity}%",
+    "format-charging": "charging {capacity}%",
+    "format-plugged": "ac {capacity}%",
+    "tooltip-format": "{timeTo}\n{power} W"
+  },
+
+  "temperature": {
+    "critical-threshold": 85,
+    "format": "temp {temperatureC}°C",
+    "tooltip": false
+  }
+}

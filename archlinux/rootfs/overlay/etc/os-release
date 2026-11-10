@@ -1,0 +1,14 @@
+NAME="OmarchySwitch"
+PRETTY_NAME="OmarchySwitch 0.1.0 (Erista)"
+ID=omarchyswitch
+ID_LIKE=arch
+BUILD_ID=rolling
+VERSION_ID=0.1.0
+VERSION="0.1.0 (base)"
+VERSION_CODENAME=erista
+ANSI_COLOR="38;2;23;147;209"
+HOME_URL="https://github.com/ClmentCch/OmarchySwitch"
+DOCUMENTATION_URL="https://github.com/ClmentCch/OmarchySwitch/tree/main/docs"
+SUPPORT_URL="https://github.com/ClmentCch/OmarchySwitch/issues"
+BUG_REPORT_URL="https://github.com/ClmentCch/OmarchySwitch/issues"
+LOGO=omarchyswitch

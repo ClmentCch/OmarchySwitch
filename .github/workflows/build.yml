@@ -1,0 +1,143 @@
+# OmarchySwitch CI
+#
+# Three jobs, with deliberately limited claims:
+#   validate   static consistency checks (no root, no network, fast)
+#   package    builds and verifies the release ZIP as an artefact
+#   rootfs     manual ARM64 bootstrap (network + root inside the runner)
+#
+# No job produces a bootable Switch image: the hardware components are not in
+# the repository (see switchroot/README.md) and cannot be downloaded by CI.
+# No job publishes a release: that is a deliberate, human action.
+
+name: build
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      build_rootfs:
+        description: 'Also bootstrap the Arch Linux ARM rootfs (ARM64 runner, ~20 min)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Values mirror build/configs/ci.env; kept inline so the workflow is readable
+  # without a checkout of the config file.
+  CI_IMAGE_SIZE: 8G
+  CI_ARTIFACT_RETENTION: 7
+
+jobs:
+  validate:
+    name: Validate repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq shellcheck python3 unzip zip rsync
+
+      - name: Tool versions
+        run: |
+          bash --version | head -n1
+          shellcheck --version | head -n2
+          python3 --version
+
+      - name: Make scripts executable
+        run: find . -name '*.sh' -not -path './.git/*' -exec chmod +x {} +
+
+      - name: Static validation
+        run: ./scripts/validate-architecture.sh
+
+      - name: Bash syntax (redundant with validation, kept explicit)
+        run: |
+          find . -name '*.sh' -not -path './.git/*' -print0 \
+            | xargs -0 -n1 bash -n
+          echo 'bash -n: ok'
+
+      - name: Confirm no hardware binaries are tracked
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -E '(^|/)(uImage|bl31\.bin|bl33\.bin|boot\.scr|nx-plat\.dtimg|initramfs)$'; then
+            echo '::error::A hardware binary is tracked in git.'
+            exit 1
+          fi
+          echo 'no hardware binary tracked'
+
+  package:
+    name: Package release archive
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq zip unzip rsync
+
+      - name: Build archive
+        run: |
+          find . -name '*.sh' -not -path './.git/*' -exec chmod +x {} +
+          ./scripts/package-release.sh
+
+      - name: Upload archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: OmarchySwitch-Base
+          path: |
+            dist/*.zip
+            dist/*.zip.sha256
+          retention-days: ${{ env.CI_ARTIFACT_RETENTION }}
+          if-no-files-found: error
+
+  rootfs:
+    name: Bootstrap Arch Linux ARM rootfs (manual)
+    if: github.event_name == 'workflow_dispatch' && inputs.build_rootfs
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq python3 rsync zstd unzip zip
+
+      - name: Bootstrap tarball (unpinned in CI, checksum printed)
+        run: |
+          find . -name '*.sh' -not -path './.git/*' -exec chmod +x {} +
+          ./scripts/bootstrap-arch.sh --allow-unpinned-tarball
+
+      - name: Build rootfs (stage only: no packages, no network churn)
+        run: |
+          # --stage-only extracts the tarball and configures pacman without
+          # installing packages: enough to prove the bootstrap path works on
+          # ARM64, and honest about what CI can verify.
+          sudo ./scripts/build-rootfs.sh --stage-only --output build/output/rootfs --yes
+
+      - name: Show result
+        run: |
+          du -sh build/output/rootfs
+          ls build/output/rootfs
+
+      - name: Upload rootfs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rootfs-stage-only
+          path: build/output/rootfs
+          retention-days: 3
+          if-no-files-found: error

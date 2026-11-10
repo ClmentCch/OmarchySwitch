@@ -1,0 +1,17 @@
+# /etc/fstab — OmarchySwitch
+#
+# Partitions are addressed by filesystem label, never by device node:
+# the Switch exposes the SD card as mmcblk0 and the internal eMMC as mmcblk1,
+# and those names are not stable across boot media.
+#
+# @BOOT_LABEL@ and @ROOT_LABEL@ are replaced at build time with the values of
+# BOOT_FS_LABEL and ROOT_FS_LABEL from configs/omarchyswitch.conf.
+#
+# nofail on /boot: a missing or unmountable boot partition must not drop the
+# system into emergency mode, where the handheld has no usable keyboard.
+
+LABEL=@BOOT_LABEL@  /boot  vfat  defaults,noatime,nofail  0 2
+LABEL=@ROOT_LABEL@  /      ext4  defaults,noatime         0 1
+
+# Optional: tmpfs for /tmp (useful on eMMC/SD, spares write cycles)
+tmpfs  /tmp  tmpfs  defaults,noatime,size=512M,mode=1777  0 0

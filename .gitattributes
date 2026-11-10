@@ -1,0 +1,22 @@
+* text=auto eol=lf
+
+# Shell scripts must keep LF and be executable in the index
+*.sh            text eol=lf
+*.bash          text eol=lf
+scripts/**      text eol=lf
+
+# Configuration and documentation
+*.md            text eol=lf
+*.ini           text eol=lf
+*.conf          text eol=lf
+*.toml          text eol=lf
+*.jsonc         text eol=lf
+*.txt           text eol=lf
+
+# Never diff binaries
+*.bin           binary
+*.dtb           binary
+*.dtbo          binary
+*.dtimg         binary
+*.img           binary
+*.zip           binary
