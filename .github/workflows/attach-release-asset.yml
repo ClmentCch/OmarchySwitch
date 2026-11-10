@@ -46,8 +46,8 @@ jobs:
         run: |
           set -euo pipefail
           gh release upload "${{ steps.rel.outputs.tag }}" \
-            release/OmarchySwitch-Base-v0.1.0.zip \
-            release/OmarchySwitch-Base-v0.1.0.zip.sha256 \
+            release/*.zip \
+            release/*.sha256 \
             --repo "$GITHUB_REPOSITORY" --clobber
 
       - name: Enforce the release metadata
