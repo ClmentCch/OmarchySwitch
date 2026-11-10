@@ -1,6 +1,6 @@
 # One-shot helper: attach the verified v0.1.0 archive to the existing GitHub
-# release. Lives on the `release-asset` branch only; it is not part of the
-# distribution sources.
+# release and enforce the release metadata. Lives on the `release-asset` branch
+# only; it is not part of the distribution sources.
 name: attach-release-asset
 
 on:
@@ -37,8 +37,6 @@ jobs:
       - name: Verify the archive before uploading
         run: |
           set -euo pipefail
-          sha256sum -c release/OmarchySwitch-Base-v0.1.0.zip.sha256 \
-            --ignore-missing 2>/dev/null || true
           cd release && sha256sum -c OmarchySwitch-Base-v0.1.0.zip.sha256
           unzip -t OmarchySwitch-Base-v0.1.0.zip >/dev/null
 
@@ -51,3 +49,21 @@ jobs:
             release/OmarchySwitch-Base-v0.1.0.zip \
             release/OmarchySwitch-Base-v0.1.0.zip.sha256 \
             --repo "$GITHUB_REPOSITORY" --clobber
+
+      - name: Enforce the release metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cat > /tmp/notes.md <<'NOTES'
+          Première base technique d'OmarchySwitch pour Nintendo Switch V1 Erista.
+
+          Cette version contient l'architecture du projet, les scripts de préparation d'Arch Linux ARM64, les configurations Omarchy, les emplacements d'intégration Switchroot, les scripts de construction et la documentation.
+
+          Cette version constitue une base de développement. Elle ne représente pas encore une distribution installable ou entièrement fonctionnelle.
+          NOTES
+          gh release edit "${{ steps.rel.outputs.tag }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "OmarchySwitch Base v0.1.0" \
+            --prerelease \
+            --notes-file /tmp/notes.md
